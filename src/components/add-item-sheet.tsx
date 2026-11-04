@@ -91,7 +91,7 @@ export function AddItemSheet({
 }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full gap-0 p-0 sm:max-w-3xl">
+      <SheetContent side="right" className="gap-0 p-0 data-[side=right]:w-full data-[side=right]:sm:max-w-[min(75vw,64rem)]">
         {/* Remount on each open so the form starts fresh. */}
         {open && (
           <AddItemForm
