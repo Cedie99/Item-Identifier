@@ -639,7 +639,6 @@ This only removes the copy added here.`)) return
         items={items}
         template={addTemplate}
         editing={editItem}
-        defaultSheet={brandSheet}
         brands={brandBase.list}
         onSaved={onSaved}
       />

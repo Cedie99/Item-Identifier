@@ -59,8 +59,8 @@ const SECTIONS: { title: string; fields: FieldSpec[] }[] = [
 const FORM_KEYS = new Set<FieldKey>([...SECTIONS.flatMap((s) => s.fields.map((f) => f.k)), "BarcodeNumber", "Remarks"])
 const NOT_COPIED = new Set<FieldKey>(["ItemNumber", "BarcodeNumber"])
 
-function startDraft(from: Item | null, sheet: string, copyAll: boolean): Draft {
-  if (!from) return { sheet, ItemType: "Finished Goods" }
+function startDraft(from: Item | null, copyAll: boolean): Draft {
+  if (!from) return { sheet: "", ItemType: "Finished Goods" }
   const d: Draft = { sheet: from.sheet }
   FIELDS.forEach(([k]) => {
     if ((copyAll || !NOT_COPIED.has(k)) && from[k]) d[k] = from[k]
@@ -74,7 +74,6 @@ export function AddItemSheet({
   items,
   template,
   editing,
-  defaultSheet,
   brands,
   onSaved,
 }: {
@@ -85,7 +84,6 @@ export function AddItemSheet({
   template: Item | null
   /** An item added in the app, to change. */
   editing: Item | null
-  defaultSheet: string
   brands: BrandOption[]
   onSaved: (item: AddedItem, edited: boolean) => void
 }) {
@@ -99,7 +97,6 @@ export function AddItemSheet({
             items={items}
             template={template}
             editing={editing}
-            defaultSheet={defaultSheet}
             brands={brands}
             onSaved={onSaved}
             onCancel={() => onOpenChange(false)}
@@ -114,7 +111,6 @@ function AddItemForm({
   items,
   template,
   editing,
-  defaultSheet,
   brands,
   onSaved,
   onCancel,
@@ -122,13 +118,12 @@ function AddItemForm({
   items: Item[]
   template: Item | null
   editing: Item | null
-  defaultSheet: string
   brands: BrandOption[]
   onSaved: (item: AddedItem, edited: boolean) => void
   onCancel: () => void
 }) {
   const editUid = editing?.added?.uid
-  const [draft, setDraft] = useState<Draft>(() => startDraft(editing ?? template, defaultSheet, !!editing))
+  const [draft, setDraft] = useState<Draft>(() => startDraft(editing ?? template, !!editing))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [brandMode, setBrandMode] = useState<"existing" | "new">(() =>
