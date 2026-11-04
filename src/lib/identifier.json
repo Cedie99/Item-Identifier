@@ -1,0 +1,569 @@
+{
+  "source": {
+    "file": "Identifier_2(AutoRecovered).xlsx",
+    "asOf": "2026-11-04"
+  },
+  "units": [
+    {
+      "label": "Bottle",
+      "code": "01"
+    },
+    {
+      "label": "Box",
+      "code": "02"
+    },
+    {
+      "label": "Pail",
+      "code": "03"
+    },
+    {
+      "label": "Drum",
+      "code": "04"
+    },
+    {
+      "label": "G",
+      "code": "05"
+    },
+    {
+      "label": "Gal",
+      "code": "06"
+    },
+    {
+      "label": "Car",
+      "code": "07"
+    },
+    {
+      "label": "Cup",
+      "code": "08"
+    },
+    {
+      "label": "Can",
+      "code": "09"
+    },
+    {
+      "label": "Kg",
+      "code": "10"
+    },
+    {
+      "label": "Sac",
+      "code": "11"
+    },
+    {
+      "label": "Tub",
+      "code": "12"
+    },
+    {
+      "label": "IBC",
+      "code": "13"
+    },
+    {
+      "label": "LT",
+      "code": "14"
+    },
+    {
+      "label": "Pc",
+      "code": "15"
+    },
+    {
+      "label": "Unit",
+      "code": "16"
+    }
+  ],
+  "brands": [
+    {
+      "name": "Platinum",
+      "code": "001"
+    },
+    {
+      "name": "Comet",
+      "code": "002"
+    },
+    {
+      "name": "Generic",
+      "code": "003"
+    },
+    {
+      "name": "888",
+      "code": "004"
+    },
+    {
+      "name": "ACMOBILITY",
+      "code": "005"
+    },
+    {
+      "name": "AP LUBES",
+      "code": "006"
+    },
+    {
+      "name": "ARCOIL",
+      "code": "007"
+    },
+    {
+      "name": "ARROW-HEAD",
+      "code": "008"
+    },
+    {
+      "name": "ATLAS",
+      "code": "009"
+    },
+    {
+      "name": "AUTOAID",
+      "code": "010"
+    },
+    {
+      "name": "BAY FUELS",
+      "code": "011"
+    },
+    {
+      "name": "BEST1",
+      "code": "012"
+    },
+    {
+      "name": "BISON",
+      "code": "013"
+    },
+    {
+      "name": "BOOST",
+      "code": "014"
+    },
+    {
+      "name": "BRISTOL",
+      "code": "015"
+    },
+    {
+      "name": "BSM",
+      "code": "016"
+    },
+    {
+      "name": "CENTRUM",
+      "code": "017"
+    },
+    {
+      "name": "EMPORIUM",
+      "code": "018"
+    },
+    {
+      "name": "EXCEL LUBE",
+      "code": "019"
+    },
+    {
+      "name": "EZ JONES",
+      "code": "020"
+    },
+    {
+      "name": "EZWORKS",
+      "code": "021"
+    },
+    {
+      "name": "FAMOUS",
+      "code": "022"
+    },
+    {
+      "name": "FITLUBE",
+      "code": "023"
+    },
+    {
+      "name": "FRIZOL",
+      "code": "024"
+    },
+    {
+      "name": "GANDHAR",
+      "code": "025"
+    },
+    {
+      "name": "GT OIL",
+      "code": "026"
+    },
+    {
+      "name": "HEBRON",
+      "code": "027"
+    },
+    {
+      "name": "HOUSTON",
+      "code": "028"
+    },
+    {
+      "name": "JICO",
+      "code": "029"
+    },
+    {
+      "name": "KEVLON",
+      "code": "030"
+    },
+    {
+      "name": "LEON",
+      "code": "031"
+    },
+    {
+      "name": "LUBE 78",
+      "code": "032"
+    },
+    {
+      "name": "LUBEPRO",
+      "code": "033"
+    },
+    {
+      "name": "LUBERITE",
+      "code": "034"
+    },
+    {
+      "name": "LUBGEAR",
+      "code": "035"
+    },
+    {
+      "name": "LUBPASTE",
+      "code": "036"
+    },
+    {
+      "name": "LUBRIKINETIC",
+      "code": "037"
+    },
+    {
+      "name": "LUBRITECH",
+      "code": "038"
+    },
+    {
+      "name": "MAC",
+      "code": "039"
+    },
+    {
+      "name": "MACKY WORKS",
+      "code": "040"
+    },
+    {
+      "name": "MAKOTO",
+      "code": "041"
+    },
+    {
+      "name": "MEGAFLEET",
+      "code": "042"
+    },
+    {
+      "name": "MESCO",
+      "code": "043"
+    },
+    {
+      "name": "MIGHTY",
+      "code": "044"
+    },
+    {
+      "name": "MOBIL",
+      "code": "045"
+    },
+    {
+      "name": "MOTOCENTRO",
+      "code": "046"
+    },
+    {
+      "name": "MOTOMO",
+      "code": "047"
+    },
+    {
+      "name": "MZRT",
+      "code": "048"
+    },
+    {
+      "name": "NEPTUNE",
+      "code": "049"
+    },
+    {
+      "name": "NEXT",
+      "code": "050"
+    },
+    {
+      "name": "NORTHCOAST",
+      "code": "051"
+    },
+    {
+      "name": "NOVA PRIME",
+      "code": "052"
+    },
+    {
+      "name": "NU'MAN",
+      "code": "053"
+    },
+    {
+      "name": "NYNAS",
+      "code": "054"
+    },
+    {
+      "name": "O-NI",
+      "code": "055"
+    },
+    {
+      "name": "OPC",
+      "code": "056"
+    },
+    {
+      "name": "PEAK",
+      "code": "057"
+    },
+    {
+      "name": "PHANTOM",
+      "code": "058"
+    },
+    {
+      "name": "PHOENIX",
+      "code": "059"
+    },
+    {
+      "name": "PLATINUM INT'L",
+      "code": "060"
+    },
+    {
+      "name": "POLYTRON",
+      "code": "061"
+    },
+    {
+      "name": "POWER RACING",
+      "code": "062"
+    },
+    {
+      "name": "POWERLUBE",
+      "code": "063"
+    },
+    {
+      "name": "PROMOTIVE",
+      "code": "064"
+    },
+    {
+      "name": "PTT",
+      "code": "065"
+    },
+    {
+      "name": "Q-MI & JAMEX",
+      "code": "066"
+    },
+    {
+      "name": "QUICK PREMIUM LUBRICANTS",
+      "code": "067"
+    },
+    {
+      "name": "RACAL",
+      "code": "068"
+    },
+    {
+      "name": "RACELINE",
+      "code": "069"
+    },
+    {
+      "name": "REGENT",
+      "code": "070"
+    },
+    {
+      "name": "RELIALUBES",
+      "code": "071"
+    },
+    {
+      "name": "REV-1",
+      "code": "072"
+    },
+    {
+      "name": "RICHSTAR",
+      "code": "073"
+    },
+    {
+      "name": "ROTELOS",
+      "code": "074"
+    },
+    {
+      "name": "RYDER",
+      "code": "075"
+    },
+    {
+      "name": "SCT",
+      "code": "076"
+    },
+    {
+      "name": "SEAOIL",
+      "code": "077"
+    },
+    {
+      "name": "SILVESTRE",
+      "code": "078"
+    },
+    {
+      "name": "SUPREME 1",
+      "code": "079"
+    },
+    {
+      "name": "SUPREMIUM",
+      "code": "080"
+    },
+    {
+      "name": "SUPREMO",
+      "code": "081"
+    },
+    {
+      "name": "TMP",
+      "code": "082"
+    },
+    {
+      "name": "TTL",
+      "code": "083"
+    },
+    {
+      "name": "USA LUBRICANTS",
+      "code": "084"
+    },
+    {
+      "name": "VAST LUBE",
+      "code": "085"
+    },
+    {
+      "name": "VERTUS",
+      "code": "086"
+    },
+    {
+      "name": "VILLAIN",
+      "code": "087"
+    },
+    {
+      "name": "VINWORKS",
+      "code": "088"
+    },
+    {
+      "name": "VIVO",
+      "code": "089"
+    },
+    {
+      "name": "VORTEX",
+      "code": "090"
+    },
+    {
+      "name": "WHARFSLUBE",
+      "code": "091"
+    },
+    {
+      "name": "WMC",
+      "code": "092"
+    },
+    {
+      "name": "WURTH",
+      "code": "093"
+    },
+    {
+      "name": "M&S",
+      "code": "094"
+    },
+    {
+      "name": "AGRI-MATE",
+      "code": "095"
+    },
+    {
+      "name": "NXTGEN",
+      "code": "096"
+    },
+    {
+      "name": "PRECIOUS AJ",
+      "code": "097"
+    },
+    {
+      "name": "GIANWORKZ",
+      "code": "098"
+    },
+    {
+      "name": "LUBEMAN",
+      "code": "099"
+    },
+    {
+      "name": "AION",
+      "code": "100"
+    },
+    {
+      "name": "TEC",
+      "code": "101"
+    },
+    {
+      "name": "VHENWORKZ",
+      "code": "102"
+    },
+    {
+      "name": "ECOPETROL",
+      "code": "103"
+    },
+    {
+      "name": "R1 MOTO",
+      "code": "104"
+    },
+    {
+      "name": "UCM",
+      "code": "105"
+    },
+    {
+      "name": "KIRACE",
+      "code": "106"
+    },
+    {
+      "name": "ZAYTCO",
+      "code": "107"
+    },
+    {
+      "name": "VX ADVANCE",
+      "code": "108"
+    },
+    {
+      "name": "BAGANI",
+      "code": "109"
+    },
+    {
+      "name": "VCXPERTS",
+      "code": "110"
+    },
+    {
+      "name": "DMRS",
+      "code": "111"
+    },
+    {
+      "name": "LEVITRONN",
+      "code": "112"
+    },
+    {
+      "name": "ENGINE CARE TECH",
+      "code": "113"
+    },
+    {
+      "name": "R-MOTO",
+      "code": "114"
+    },
+    {
+      "name": "VORTEX PLUS",
+      "code": "115"
+    },
+    {
+      "name": "ITH",
+      "code": "116"
+    },
+    {
+      "name": "VPLUS",
+      "code": "117"
+    },
+    {
+      "name": "OILCRAFT",
+      "code": "118"
+    },
+    {
+      "name": "VURDIX",
+      "code": "119"
+    },
+    {
+      "name": "I-LUBE",
+      "code": "120"
+    }
+  ],
+  "free": [
+    "121",
+    "122",
+    "123",
+    "124",
+    "125",
+    "126",
+    "127",
+    "128",
+    "129",
+    "130",
+    "131",
+    "132",
+    "133"
+  ]
+}
