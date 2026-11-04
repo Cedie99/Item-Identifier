@@ -3,7 +3,7 @@
 //   BBB   SSSS   UU
 //   112   0001   06   → 112000106
 //
-//   BBB  = brand code. Official list: the Identifier workbook (Platinum 001, Comet 002 … I-LUBE 120).
+//   BBB  = brand code. Official list: the Identifier workbook (Platinum 001, Comet 002 …), with ERP corrections below.
 //   SSSS = item sequence inside that brand, counting up from 0001. Every item gets its own number.
 //   UU   = unit code = the item's Stock U/M (Bottle 01, Box 02, Pail 03, Drum 04 … Kg 10 … LT 14).
 //
@@ -33,6 +33,27 @@ const UNIT_HINTS: Record<string, string> = {
 }
 export const unitHint = (label: string) => UNIT_HINTS[label]
 
+/** Brand name for matching: ignores "Item Master", case, spacing and punctuation. */
+const norm = (s: string) => s.toUpperCase().replace(/^ITEM\s*MASTER\s*/, "").replace(/[^A-Z0-9]/g, "")
+
+/**
+ * Brand codes the ERP uses where the Identifier workbook says otherwise (keyed by norm(name)). These win over
+ * the workbook and are kept here so re-importing the Identifier doesn't undo them. A code freed this way
+ * becomes available again. null = the brand has no code in the ERP yet; it gets the next free number.
+ */
+const ERP_BRAND_CODES: Record<string, string | null> = {
+  ILUBE: "112", // Identifier: 120
+  LEVITRONN: null, // Identifier: 112, but not in the ERP item master yet
+}
+const erpCode = (name: string) => ERP_BRAND_CODES[norm(name)]
+
+/** Brand list: the Identifier with the ERP corrections applied. */
+const BRANDS: { name: string; code: string }[] = identifier.brands.flatMap((b) => {
+  const fix = erpCode(b.name)
+  if (fix === null) return []
+  return [{ name: b.name, code: fix ?? b.code }]
+})
+
 export const unitCodeLabel = (code: string) => UNIT_CODES.find((u) => u.code === code)?.label
 
 export interface ParsedBarcode {
@@ -56,7 +77,6 @@ const mostCommon = (m: Map<string, number>) => [...m].sort((a, b) => b[1] - a[1]
 
 // ---------- Brand code ----------
 
-const norm = (s: string) => s.toUpperCase().replace(/^ITEM\s*MASTER\s*/, "").replace(/[^A-Z0-9]/g, "")
 /** Tab names spelled differently from the Identifier. */
 const ALIASES: Record<string, string> = { VILLIAN: "VILLAIN", VHENWORKS: "VHENWORKZ", PLATINUMINT: "PLATINUMINTL" }
 
@@ -64,10 +84,10 @@ const ALIASES: Record<string, string> = { VILLIAN: "VILLAIN", VHENWORKS: "VHENWO
 export function identifierBrand(sheet: string): { name: string; code: string } | null {
   const n = ALIASES[norm(sheet)] ?? norm(sheet)
   if (!n) return null
-  const exact = identifier.brands.find((b) => norm(b.name) === n)
+  const exact = BRANDS.find((b) => norm(b.name) === n)
   if (exact) return exact
   // "Relialube" ~ RELIALUBES, "Qmi" ~ Q-MI & JAMEX, "Comet FG" ~ COMET: closest-length name that starts the same.
-  const close = identifier.brands
+  const close = BRANDS
     .filter((b) => norm(b.name).startsWith(n) || n.startsWith(norm(b.name)))
     .sort((a, b) => Math.abs(norm(a.name).length - n.length) - Math.abs(norm(b.name).length - n.length))
   return close[0] ?? null
@@ -84,9 +104,9 @@ function sheetBrandCode(rows: BarcodeRow[], sheet: string): string | null {
   return mostCommon(m) ?? null
 }
 
-/** First brand code not used by the Identifier or by any barcode, e.g. 121. */
+/** First brand code not used by the Identifier or by any barcode, e.g. 120. */
 export function nextFreeBrandCode(rows: BarcodeRow[]): string {
-  const taken = new Set(identifier.brands.map((b) => b.code))
+  const taken = new Set(BRANDS.map((b) => b.code))
   for (const r of rows) {
     const p = parseBarcode(r.barcode)
     if (p) taken.add(p.brand)
@@ -107,14 +127,22 @@ export interface BrandCode {
 }
 
 /**
- * Brand code for a tab: the code most of its existing barcodes use (the majority wins over messy outliers);
+ * Brand code for a tab: an ERP correction if there is one; otherwise the code most of its existing barcodes use (the majority wins over messy outliers);
  * otherwise the Identifier's code; otherwise the next free number.
  */
 export function brandCode(rows: BarcodeRow[], sheet: string): BrandCode {
+  // ERP corrections are authoritative, even over stray barcodes in the tab (LEVITRONN's tab holds one 109 = BAGANI).
+  const erp = erpCode(sheet)
+  if (erp) return { code: erp, source: "identifier" }
+  if (erp === null) {
+    // No ERP code yet: keep the code this tab's own new items got, skipping codes other brands own.
+    const own = sheetBrandCode(rows.filter((r) => !BRANDS.some((b) => b.code === parseBarcode(r.barcode)?.brand)), sheet)
+    return own ? { code: own, source: "sheet" } : { code: nextFreeBrandCode(rows), source: "new" }
+  }
   const used = sheetBrandCode(rows, sheet)
   const listed = identifierBrand(sheet)?.code
   if (used) {
-    const owner = identifier.brands.find((b) => b.code === used)?.name
+    const owner = BRANDS.find((b) => b.code === used)?.name
     const mine = identifierBrand(sheet)?.name
     return {
       code: used,
