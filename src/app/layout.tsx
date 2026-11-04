@@ -7,8 +7,8 @@ import "./globals.css"
 const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Item Master Finder",
-  description: "Search and filter every item across the brand tabs of the item master tracker.",
+  title: "Item Master Finder & Barcode Generator",
+  description: "Search every item in the item master tracker, and generate item classes and barcodes for new items.",
 }
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

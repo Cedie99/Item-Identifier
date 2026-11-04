@@ -1,6 +1,7 @@
-# Item Master Finder
+# Item Master Finder & Barcode Generator
 
-Search and filter every item in the item master tracker (all brand tabs) in one place.
+Search and filter every item in the item master tracker (all brand tabs) in one place, and add new items
+with a generated item class and barcode number.
 Built with Next.js, TypeScript and shadcn/ui. It never writes to the Excel file or the Google Sheet.
 
 ## Run it
@@ -20,7 +21,7 @@ npm run import-data -- "C:\Users\<you>\Downloads\Item Master Final ... .xlsx"
 ```
 
 This rewrites `public/data/items.json`, which the app loads. Anyone using the app can also click
-**Load newer Excel file** to view a fresh download in their own browser without re-importing.
+**Upload newer file** to view a fresh download in their own browser without re-importing.
 
 ## Finding items
 

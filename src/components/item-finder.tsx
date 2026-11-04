@@ -352,7 +352,8 @@ This only removes the copy added here.`)) return
         <div className="mx-auto grid w-full max-w-[90rem] gap-3 px-4 py-3 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
             <button type="button" onClick={clearAll} className="font-heading text-2xl font-bold tracking-tight" title="Start over">
-              Item Master <span className="text-brand">Finder</span>
+              Item Master <span className="text-brand">Finder</span>{" "}
+              <span className="font-semibold text-muted-foreground">&amp;</span> Barcode <span className="text-brand">Generator</span>
             </button>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
               {data && (
