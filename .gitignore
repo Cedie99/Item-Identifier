@@ -42,3 +42,6 @@ next-env.d.ts
 
 # items added in the app (company data)
 /data/added-items.json
+
+.vercel
+.env*

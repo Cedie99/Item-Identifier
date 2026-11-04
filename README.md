@@ -50,13 +50,22 @@ Click **Add item** (or **Add to <brand>** inside a brand tab, or **Add similar i
 Choose **Existing brand**, or **New brand** to create one: type the name of the Google Sheet tab it will go in, and it gets its own tab.
 Only Description and Barcode number are required (the barcode can be generated, see below). Item number is optional (if given, it must be new). With no brand chosen, the item goes in an "Unassigned" tab.
 
-Added items are saved by the app server in `data/added-items.json`, so everyone using the same running app sees them,
-marked "Added in app". They are **not** written to the Google Sheet: use the "Added in app only" filter and
-**Copy for Excel** to paste them into the sheet. Once a newer sheet with that item number is imported, the sheet row
-takes over and the added copy is hidden automatically. Added items can be removed from their item panel.
+Added items are marked "Added in app". They are **not** written to the Google Sheet: use **Copy for Excel** to paste
+them into the sheet. Once a newer sheet with that item number is imported, the sheet row takes over and the added copy
+is hidden automatically. Added items can be removed from their item panel.
 
-This needs the app to run as a server (`npm run dev` or `npm run build && npm start`); it can't save on a static host
-or on Vercel, whose file system is read-only.
+Where added items are saved:
+
+- **Online database (Neon Postgres via Vercel)** when `DATABASE_URL` is set. That's the Vercel deployment, and also your PC
+  once `.env.local` has been pulled (`vercel env pull .env.local --yes`), so the website and local copies share one list.
+  The database enforces unique barcodes and item numbers, so two people saving at once never get the same barcode.
+- **`data/added-items.json`** on the PC when there's no `DATABASE_URL`. To move items saved that way into the database,
+  run `npm run copy-added-to-db` (safe to run twice; items already there are skipped).
+
+## Deploying
+
+The project is linked to Vercel (`item-identifier`) and connected to GitHub: every push to `main` deploys to production.
+Manual deploy: `vercel --prod`.
 
 ## Barcode numbers
 
