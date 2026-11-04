@@ -238,7 +238,7 @@ function AddItemForm({
         key={k}
         label={FIELD_LABEL[k]}
         required={required}
-        hint={hint}
+        hint={k === "ItemClassId" && showParts ? undefined : hint}
         wide={wide}
         error={isNum && clash ? `Already used by “${clash.ItemDescription}” in ${clash.brand}.` : undefined}
       >
@@ -249,6 +249,7 @@ function AddItemForm({
           onChange={(e) => set(k, e.target.value)}
           autoFocus={isNum && !!template && !editing}
           aria-invalid={isNum && !!clash}
+          title={draft[k] || undefined}
           className={mono ? "font-mono" : undefined}
         />
         {list && (
@@ -257,11 +258,12 @@ function AddItemForm({
           </datalist>
         )}
         {k === "ItemClassId" && showParts && (
-          <dl className="mt-1 grid grid-cols-2 gap-1 sm:grid-cols-4">
+          <dl className="mt-1 divide-y divide-border overflow-hidden rounded-lg border bg-muted/40">
             {CLASS_PARTS.map(([pk, label], i) => (
-              <div key={pk} className="rounded-md bg-muted px-2 py-1">
-                <dt className="text-[11px] text-muted-foreground">{label}</dt>
-                <dd className={cn("truncate text-xs font-medium", !classParts[i] && "text-warn")} title={classParts[i]}>
+              <div key={pk} className="grid grid-cols-[1.25rem_7.5rem_1fr] items-baseline gap-2 px-2.5 py-1.5">
+                <span className="font-mono text-[11px] text-muted-foreground tabular-nums">{i + 1}</span>
+                <dt className="text-xs text-muted-foreground">{label}</dt>
+                <dd className={cn("text-xs font-medium break-words", !classParts[i] && "text-warn italic")}>
                   {classParts[i] || "Blank"}
                 </dd>
               </div>
