@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronDownIcon, ChevronUpIcon, CopyPlusIcon, LinkIcon, Trash2Icon } from "lucide-react"
+import { ChevronDownIcon, ChevronUpIcon, CopyPlusIcon, LinkIcon, PencilIcon, Trash2Icon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -61,6 +61,7 @@ export function ItemSheet({
   onStep,
   onBrowse,
   onAddSimilar,
+  onEdit,
   onRemove,
 }: {
   item: Item | null
@@ -72,6 +73,7 @@ export function ItemSheet({
   onStep: (delta: 1 | -1) => void
   onBrowse: (filters: Partial<Record<FacetKey, string[]>>) => void
   onAddSimilar: (item: Item) => void
+  onEdit: (item: Item) => void
   onRemove: (item: Item) => void
 }) {
   const { index, total } = position
@@ -139,6 +141,11 @@ export function ItemSheet({
                 <Button variant="outline" size="sm" onClick={() => onAddSimilar(item)}>
                   <CopyPlusIcon /> Add similar item
                 </Button>
+                {item.added && (
+                  <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
+                    <PencilIcon /> Edit
+                  </Button>
+                )}
                 {item.added && (
                   <Button variant="outline" size="sm" className="text-warn hover:text-warn" onClick={() => onRemove(item)}>
                     <Trash2Icon /> Remove

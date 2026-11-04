@@ -71,6 +71,7 @@ export function ItemFinder() {
   const [added, setAdded] = useState<AddedItem[]>([])
   const [addOpen, setAddOpen] = useState(false)
   const [addTemplate, setAddTemplate] = useState<Item | null>(null)
+  const [editItem, setEditItem] = useState<Item | null>(null)
   const pendingItem = useRef<string | null>(null)
   /** Open this added item as soon as it shows up in the list. */
   const pendingUid = useRef<string | null>(null)
@@ -286,16 +287,17 @@ export function ItemFinder() {
     }
   }
 
-  function startAdd(template: Item | null) {
-    setAddTemplate(template)
+  function startAdd(template: Item | null, edit: Item | null = null) {
+    setAddTemplate(edit ? null : template)
+    setEditItem(edit)
     setOpenId(null)
     setAddOpen(true)
   }
 
-  function onAdded(a: AddedItem) {
+  function onSaved(a: AddedItem, edited: boolean) {
     setAddOpen(false)
     pendingUid.current = a.uid
-    setAdded((list) => [...list, a])
+    setAdded((list) => (edited ? list.map((x) => (x.uid === a.uid ? a : x)) : [...list, a]))
     // Show the new item in its brand tab (a new brand gets its own tab).
     update({ ...EMPTY_FILTERS, brand: [a.sheet] })
   }
@@ -626,6 +628,7 @@ This only removes the copy added here.`)) return
           window.scrollTo({ top: 0, behavior: "smooth" })
         }}
         onAddSimilar={(o) => startAdd(o)}
+        onEdit={(o) => startAdd(null, o)}
         onRemove={removeAdded}
       />
 
@@ -634,9 +637,10 @@ This only removes the copy added here.`)) return
         onOpenChange={setAddOpen}
         items={items}
         template={addTemplate}
+        editing={editItem}
         defaultSheet={brandSheet}
         brands={brandBase.list}
-        onAdded={onAdded}
+        onSaved={onSaved}
       />
     </div>
   )

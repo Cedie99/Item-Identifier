@@ -31,6 +31,8 @@ class TakenError extends Error {}
 interface Store {
   list(): Promise<AddedItem[]>
   insert(item: AddedItem): Promise<void>
+  /** Replace an added item's brand and fields. False when it no longer exists. */
+  update(item: AddedItem): Promise<boolean>
   remove(uid: string): Promise<boolean>
 }
 
@@ -74,6 +76,19 @@ const fileStore: Store = {
       if (list.some((a) => a.fields.BarcodeNumber === item.fields.BarcodeNumber || (num && a.fields.ItemNumber?.toLowerCase() === num)))
         throw new TakenError()
       await writeFile([...list, item])
+    }),
+  update: (item) =>
+    exclusive(async () => {
+      const list = await readFile()
+      const i = list.findIndex((a) => a.uid === item.uid)
+      if (i < 0) return false
+      const num = item.fields.ItemNumber?.toLowerCase()
+      if (list.some((a) => a.uid !== item.uid && (a.fields.BarcodeNumber === item.fields.BarcodeNumber || (num && a.fields.ItemNumber?.toLowerCase() === num))))
+        throw new TakenError()
+      const next = [...list]
+      next[i] = { ...list[i], sheet: item.sheet, fields: item.fields }
+      await writeFile(next)
+      return true
     }),
   remove: (uid) =>
     exclusive(async () => {
@@ -131,6 +146,19 @@ const dbStore: Store = {
                 ${item.fields.BarcodeNumber}, ${item.fields.ItemNumber?.toLowerCase() ?? null})`
     } catch (e) {
       if ((e as { code?: string }).code === "23505") throw new TakenError() // unique violation
+      throw e
+    }
+  },
+  async update(item) {
+    const { sql, ready } = db()
+    await ready
+    try {
+      const rows = await sql`UPDATE added_items SET sheet = ${item.sheet}, fields = ${JSON.stringify(item.fields)}::jsonb,
+          barcode = ${item.fields.BarcodeNumber}, item_number = ${item.fields.ItemNumber?.toLowerCase() ?? null}
+        WHERE uid = ${item.uid} RETURNING uid`
+      return rows.length > 0
+    } catch (e) {
+      if ((e as { code?: string }).code === "23505") throw new TakenError()
       throw e
     }
   },
@@ -196,11 +224,20 @@ export function parseInput(body: unknown): AddInput {
   return { sheet: brand, fields: clean, autoBarcodeUnit: (autoBarcodeUnit as string | undefined) ?? undefined }
 }
 
-export async function addItem({ autoBarcodeUnit, ...input }: AddInput): Promise<AddedItem> {
+export const addItem = (input: AddInput) => saveItem(input)
+
+/** Change an item that was added in the app. */
+export const updateItem = (uid: string, input: AddInput) => saveItem(input, uid)
+
+async function saveItem({ autoBarcodeUnit, ...input }: AddInput, uid?: string): Promise<AddedItem> {
   const sheet = await sheetData()
   // A generated barcode can be taken by someone saving at the same moment; renumber and try again.
   for (let attempt = 0; attempt < 5; attempt++) {
-    const list = await store().list()
+    const all = await store().list()
+    const current = uid ? all.find((a) => a.uid === uid) : undefined
+    if (uid && !current) throw new InputError("That item is no longer in the added list.", 404)
+    // When editing, the item's own barcode and number don't count as taken.
+    const list = all.filter((a) => a.uid !== uid)
     const used: BarcodeRow[] = [...sheet.barcodes, ...list.map((a) => ({ sheet: a.sheet, barcode: a.fields.BarcodeNumber ?? "" }))]
     const fields = { ...input.fields }
 
@@ -219,9 +256,12 @@ export async function addItem({ autoBarcodeUnit, ...input }: AddInput): Promise<
     if (num && list.some((a) => a.fields.ItemNumber?.toLowerCase() === num))
       throw new InputError(`Item number ${fields.ItemNumber} was already added in the app.`, 409)
 
-    const item: AddedItem = { uid: randomUUID(), sheet: input.sheet, fields, addedAt: new Date().toISOString() }
+    const item: AddedItem = current
+      ? { ...current, sheet: input.sheet, fields }
+      : { uid: randomUUID(), sheet: input.sheet, fields, addedAt: new Date().toISOString() }
     try {
-      await store().insert(item)
+      if (!current) await store().insert(item)
+      else if (!(await store().update(item))) throw new InputError("That item is no longer in the added list.", 404)
       return item
     } catch (e) {
       if (!(e instanceof TakenError)) throw e

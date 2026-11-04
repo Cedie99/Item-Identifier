@@ -1,5 +1,5 @@
 import { connection } from "next/server"
-import { addItem, InputError, parseInput, readAdded, removeItem } from "@/lib/added-store"
+import { addItem, InputError, parseInput, readAdded, removeItem, updateItem } from "@/lib/added-store"
 
 const fail = (e: unknown) =>
   e instanceof InputError
@@ -21,6 +21,17 @@ export async function POST(request: Request) {
   try {
     const item = await addItem(parseInput(await request.json().catch(() => null)))
     return Response.json(item, { status: 201 })
+  } catch (e) {
+    return fail(e)
+  }
+}
+
+/** Edit an added item: /api/items?uid=… with the same body as POST. */
+export async function PUT(request: Request) {
+  const uid = new URL(request.url).searchParams.get("uid")
+  if (!uid) return Response.json({ error: "Which item? Missing uid." }, { status: 400 })
+  try {
+    return Response.json(await updateItem(uid, parseInput(await request.json().catch(() => null))))
   } catch (e) {
     return fail(e)
   }
