@@ -369,7 +369,7 @@ This only removes the copy added here.`)) return
                 </>
               )}
               <Button variant="ghost" size="xs" onClick={() => fileRef.current?.click()} title="Load a newer download of the tracker">
-                <FileUpIcon /> Load newer file
+                <FileUpIcon /> Upload newer file
               </Button>
               <input
                 ref={fileRef}
