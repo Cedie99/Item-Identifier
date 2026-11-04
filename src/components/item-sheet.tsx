@@ -29,8 +29,8 @@ function Value({ v }: { v: string }) {
   return <span className="break-words">{v}</span>
 }
 
-/** Barcode with its parts: brand code, item number in the brand, unit code. */
-function BarcodeValue({ v }: { v: string }) {
+/** Barcode with its parts: brand code, item number in the brand, unit code; plus the pack barcode (box, pail, drum). */
+function BarcodeValue({ v, packCode, packUnit, pack }: { v: string; packCode: string; packUnit: string; pack: string }) {
   const p = parseBarcode(v)
   if (!p) return <Value v={v} />
   return (
@@ -39,6 +39,15 @@ function BarcodeValue({ v }: { v: string }) {
       <span className="text-xs text-muted-foreground">
         brand {p.brand} · item {p.seq} · unit {p.unit}{unitCodeLabel(p.unit) ? ` (${unitCodeLabel(p.unit)})` : ""}
       </span>
+      {packCode && (
+        <span className="mt-1 flex items-center gap-1">
+          <span className="grid">
+            <span>{packCode}</span>
+            <span className="text-xs text-muted-foreground">{packUnit.toLowerCase()} barcode{pack ? ` (${pack})` : ""}</span>
+          </span>
+          <CopyButton value={packCode} label={`${packUnit.toLowerCase()} barcode`} />
+        </span>
+      )}
     </span>
   )
 }
@@ -184,7 +193,7 @@ export function ItemSheet({
                         <div key={k} className="contents">
                           <dt className="border-b py-1.5 pr-3 text-muted-foreground">{FIELD_LABEL[k]}</dt>
                           <dd className="flex min-h-9 items-center justify-between gap-2 border-b py-1">
-                            {k === "BarcodeNumber" ? <BarcodeValue v={item[k]} /> : <Value v={item[k]} />}
+                            {k === "BarcodeNumber" ? <BarcodeValue v={item[k]} packCode={item.packBarcode} packUnit={item.packUnit} pack={item.pack} /> : <Value v={item[k]} />}
                             {item[k] && COPYABLE.has(k) && <CopyButton value={item[k]} label={FIELD_LABEL[k]} />}
                           </dd>
                         </div>

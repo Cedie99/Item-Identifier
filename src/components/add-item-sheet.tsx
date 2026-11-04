@@ -129,7 +129,7 @@ function AddItemForm({
   const unitFrom = unitPicked ? "" : umUnit ? `Stock U/M “${draft.StockUmId?.trim()}”` : packUnit ? `“${packFromText}” in the description` : ""
   const autoBarcode = barcodeMode === "auto"
   const typedBarcode = (draft.BarcodeNumber ?? "").trim()
-  const sameBarcode = !autoBarcode && typedBarcode ? items.find((o) => o.BarcodeNumber === typedBarcode) : undefined
+  const sameBarcode = !autoBarcode && typedBarcode ? items.find((o) => o.BarcodeNumber === typedBarcode || o.packBarcode === typedBarcode) : undefined
   const barcodeError = sameBarcode ? `Already used by “${sameBarcode.ItemDescription}” in ${sameBarcode.brand}.` : undefined
 
   async function submit(e: React.FormEvent) {
@@ -265,6 +265,7 @@ function AddItemForm({
                 unitCode={unitCode}
                 unitFrom={unitFrom}
                 onUnitCode={setUnitPicked}
+                pack={packFromText}
                 manual={draft.BarcodeNumber ?? ""}
                 onManual={(v) => set("BarcodeNumber", v)}
                 error={barcodeError}

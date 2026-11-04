@@ -111,6 +111,7 @@ export function ItemTable({
                   <Unit um={o.StockUmId} />
                   {!hideBrand && <span>{o.brand}</span>}
                   {o.BarcodeNumber && <span className="font-mono">{o.BarcodeNumber}</span>}
+                  {o.packBarcode && <span className="font-mono">{o.packUnit.toLowerCase()} {o.packBarcode}</span>}
                 </div>
                 {(o.flags.length > 0 || o.added) && (
                   <div className="mt-1 flex flex-wrap gap-1">
@@ -123,6 +124,11 @@ export function ItemTable({
               </TableCell>
               <TableCell className="hidden font-mono text-[13px] tabular-nums lg:table-cell">
                 <Highlight text={o.BarcodeNumber} words={words} />
+                {o.packBarcode && (
+                  <div className="text-xs text-muted-foreground" title={`${o.packUnit} barcode`}>
+                    {o.packUnit.toLowerCase()} <Highlight text={o.packBarcode} words={words} />
+                  </div>
+                )}
               </TableCell>
               <TableCell className="hidden md:table-cell"><Unit um={o.StockUmId} /></TableCell>
               {!hideBrand && (

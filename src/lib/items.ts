@@ -1,3 +1,4 @@
+import { packBarcode } from "./barcode"
 import { FIELDS, type Dataset, type FieldKey } from "./parse-workbook"
 
 export type Item = Record<FieldKey, string> & {
@@ -13,6 +14,10 @@ export type Item = Record<FieldKey, string> & {
   grade: string
   /** Pack size (Drum 200L, Pail 20L, Box 12×1L…). */
   pack: string
+  /** Second barcode for the pack the item comes in (box of bottles, pail/drum of kg grease…), or "". */
+  packBarcode: string
+  /** What packBarcode is for: Box, Pail or Drum. */
+  packUnit: string
   hay: string
   hayCompact: string
   /** Set for items people added in this app (not yet in the Google Sheet). */
@@ -174,7 +179,11 @@ export function toItems(d: Dataset, added: AddedItem[] = []): Item[] {
     ;[o.kind, o.kindGuessed] = deriveKind(cls, desc)
     o.grade = deriveGrade(cls, desc)
     o.pack = derivePack(cls, desc)
-    const hay = [...SEARCH_FIELDS.map((k) => o[k]), o.brand, derivedWords(o)].join(" ").toLowerCase()
+    const pb = packBarcode(o.BarcodeNumber, o.pack)
+    o.packBarcode = pb?.barcode ?? ""
+    o.packUnit = pb?.unit ?? ""
+    // The pack barcode is searchable too, so scanning a box or drum finds its item.
+    const hay = [...SEARCH_FIELDS.map((k) => o[k]), o.packBarcode, o.brand, derivedWords(o)].join(" ").toLowerCase()
     o.hay = hay
     o.hayCompact = normalize(hay)
     return o
@@ -242,7 +251,7 @@ function score(o: Item, q: string, t: Tok[]) {
   const num = o.ItemNumber.toLowerCase()
   const desc = o.ItemDescription.toLowerCase()
   let s = 0
-  if (num === q || o.BarcodeNumber === q) s += 1000
+  if (num === q || o.BarcodeNumber === q || o.packBarcode === q) s += 1000
   else if (num.startsWith(q)) s += 500
   if (desc.startsWith(q)) s += 60
   else if (desc.includes(q)) s += 40

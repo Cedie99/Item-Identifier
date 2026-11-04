@@ -15,6 +15,7 @@ import { BrandTabs } from "@/components/brand-tabs"
 import { copyToClipboard } from "@/components/copy-button"
 import { ItemSheet } from "@/components/item-sheet"
 import { ItemTable } from "@/components/item-table"
+import { Pager } from "@/components/pager"
 import { ThemeToggle } from "@/components/theme-toggle"
 import {
   activeFilterCount, brandName, buildVocabulary, compareBrand, EMPTY_FILTERS, FACETS, facetLabel, filtersFromUrl, filtersToUrl,
@@ -22,7 +23,7 @@ import {
 } from "@/lib/items"
 import type { Dataset } from "@/lib/parse-workbook"
 
-const PAGE = 100
+const PAGE = 50
 const STORE_KEY = "item-master-finder:uploaded"
 
 function readSaved(): Dataset | null {
@@ -60,7 +61,8 @@ export function ItemFinder() {
   const [data, setData] = useState<Dataset | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
-  const [shown, setShown] = useState(PAGE)
+  /** Current results page, 0-based. */
+  const [pageIndex, setPageIndex] = useState(0)
   const [openId, setOpenId] = useState<number | null>(null)
   const [activeId, setActiveId] = useState<number | null>(null)
   const [ready, setReady] = useState(false)
@@ -75,7 +77,7 @@ export function ItemFinder() {
   const searchRef = useRef<HTMLInputElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const headerRef = useRef<HTMLElement>(null)
-  const sentinelRef = useRef<HTMLDivElement>(null)
+  const resultsRef = useRef<HTMLDivElement>(null)
 
   const loadData = useCallback((preferSaved: boolean) => {
     fetchDataset(preferSaved).then(setData, (e: Error) =>
@@ -155,7 +157,9 @@ export function ItemFinder() {
   const openItem = items.find((o) => o.id === openId) ?? null
   const dupes = openItem?.ItemNumber ? items.filter((o) => o.ItemNumber === openItem.ItemNumber && o.id !== openItem.id) : []
   const openIndex = openId == null ? -1 : results.findIndex((o) => o.id === openId)
-  const visible = results.slice(0, shown)
+  // Clamp, so a page past the end (results shrank, e.g. an item was removed) shows the last page instead.
+  const page = Math.min(pageIndex, Math.max(0, Math.ceil(results.length / PAGE) - 1))
+  const visible = results.slice(page * PAGE, (page + 1) * PAGE)
   const highlighted = activeId != null && visible.some((o) => o.id === activeId) ? activeId : hasQuery ? (visible[0]?.id ?? null) : null
 
   // Open an item linked from the URL once the data is in.
@@ -193,23 +197,20 @@ export function ItemFinder() {
     return () => ro.disconnect()
   }, [])
 
-  // Load more rows as the user scrolls near the end.
-  useEffect(() => {
-    const el = sentinelRef.current
-    if (!el) return
-    const io = new IntersectionObserver((e) => e[0].isIntersecting && setShown((s) => s + PAGE), { rootMargin: "600px" })
-    io.observe(el)
-    return () => io.disconnect()
-  }, [results.length, shown])
+  const goToPage = (p: number) => {
+    setPageIndex(p)
+    setActiveId(null)
+    resultsRef.current?.scrollIntoView({ block: "start", behavior: "smooth" })
+  }
 
   const update = (patch: Partial<Filters>) => {
     setFilters((f) => ({ ...f, ...patch }))
-    setShown(PAGE)
+    setPageIndex(0)
     setActiveId(null)
   }
   const toggleFacet = (key: FacetKey, v: string) => {
     setFilters((f) => ({ ...f, [key]: f[key].includes(v) ? f[key].filter((x) => x !== v) : [...f[key], v] }))
-    setShown(PAGE)
+    setPageIndex(0)
     setActiveId(null)
   }
   const onlyFacet = (key: FacetKey, v: string) => {
@@ -218,7 +219,7 @@ export function ItemFinder() {
   }
   const clearAll = () => {
     setFilters(EMPTY_FILTERS)
-    setShown(PAGE)
+    setPageIndex(0)
     setActiveId(null)
     searchRef.current?.focus()
   }
@@ -231,7 +232,8 @@ export function ItemFinder() {
   const step = (delta: 1 | -1) => {
     const i = openIndex + delta
     if (i < 0 || i >= results.length) return
-    if (i >= shown) setShown(i + PAGE)
+    // Prev/next in the item panel follows the results across pages.
+    setPageIndex(Math.floor(i / PAGE))
     open(results[i].id)
   }
 
@@ -557,7 +559,7 @@ This only removes the copy added here.`)) return
             </div>
           )}
 
-          <Card className="gap-0 overflow-hidden py-0">
+          <Card ref={resultsRef} className="scroll-mt-[calc(var(--hdr,0px)+0.75rem)] gap-0 overflow-hidden py-0">
             {data && idle ? (
               <BrandGrid brands={brands} kinds={brandBase.kinds} onSelect={selectBrand} />
             ) : error ? (
@@ -599,13 +601,7 @@ This only removes the copy added here.`)) return
                   onFilter={onlyFacet}
                   hideBrand={!!currentBrand}
                 />
-                {results.length > shown && (
-                  <div ref={sentinelRef} className="flex justify-center border-t p-3">
-                    <Button variant="outline" onClick={() => setShown((s) => s + PAGE)}>
-                      Show more ({(results.length - shown).toLocaleString()} left)
-                    </Button>
-                  </div>
-                )}
+                <Pager page={page} pageSize={PAGE} total={results.length} onPage={goToPage} />
               </>
             )}
           </Card>

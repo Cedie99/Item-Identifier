@@ -4,7 +4,7 @@ import { InfoIcon, WandSparklesIcon } from "lucide-react"
 import { CopyButton } from "@/components/copy-button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { parseBarcode, UNIT_CODES, unitCodeLabel, unitHint, type BrandCode } from "@/lib/barcode"
+import { packBarcode, parseBarcode, UNIT_CODES, unitCodeLabel, unitHint, type BrandCode } from "@/lib/barcode"
 import { cn } from "@/lib/utils"
 
 export type BarcodeMode = "auto" | "manual"
@@ -19,6 +19,7 @@ export function BarcodeField({
   unitCode,
   unitFrom,
   onUnitCode,
+  pack,
   manual,
   onManual,
   error,
@@ -33,6 +34,8 @@ export function BarcodeField({
   /** Where the unit code was picked from, e.g. "Stock U/M DRUM" or "“Drum 200L” in the description". */
   unitFrom: string
   onUnitCode: (code: string) => void
+  /** Pack size from the description (Box 12×1L, Pail 15kg…); boxed and kg items also get a pack barcode. */
+  pack: string
   manual: string
   onManual: (v: string) => void
   error?: string
@@ -40,6 +43,13 @@ export function BarcodeField({
   const parsed = parseBarcode(manual)
   const unitItems = UNIT_CODES.map((u) => ({ value: u.code, label: `${u.code} · ${u.label}` }))
   const unitName = unitCodeLabel(unitCode)
+  const pb = packBarcode(mode === "auto" ? `${brand?.code ?? ""}${seq ?? ""}${unitCode}` : manual, pack)
+  const packLine = pb && (
+    <span className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+      {pb.unit} barcode: <span className="font-mono text-foreground">{pb.barcode}</span> (same number, unit {pb.barcode.slice(7)} {pb.unit},
+      for the {pack})
+    </span>
+  )
 
   return (
     <div className="grid gap-2">
@@ -85,6 +95,7 @@ export function BarcodeField({
                   {brand.source === "new" && " (new brand code)"} · {seq ?? "····"} = item #{seq ? Number(seq) : "?"} in brand ·{" "}
                   {unitCode || "··"} = {unitName ?? "choose the unit below"}
                 </span>
+                {packLine}
               </div>
 
               {brand.source === "new" && (
@@ -146,6 +157,7 @@ export function BarcodeField({
           ) : (
             <span className="text-xs text-muted-foreground">9 digits: brand code (3) + item number in brand (4) + unit code (2).</span>
           )}
+          {!error && packLine}
         </>
       )}
     </div>

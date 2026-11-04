@@ -190,3 +190,35 @@ export function unitCodeForPack(pack: string): string | null {
 }
 
 export const composeBarcode = (brand: string, seq: string, unit: string) => `${brand}${seq}${unit}`
+
+// ---------- Pack barcode ----------
+
+const codeOf = (label: string, fallback: string) => UNIT_CODES.find((u) => u.label === label)?.code ?? fallback
+const BOX = codeOf("Box", "02")
+const PAIL = codeOf("Pail", "03")
+const DRUM = codeOf("Drum", "04")
+const KG = codeOf("Kg", "10")
+/** Units that come packed in a box: Bottle (12X1L, 60X200ML), Gal (6X4, 4X4), Cup (144X50G), Can (12X500G). */
+const BOXED_UNITS = new Set([codeOf("Bottle", "01"), codeOf("Gal", "06"), codeOf("Cup", "08"), codeOf("Can", "09")])
+
+export interface PackBarcode {
+  barcode: string
+  /** The pack this barcode is for: Box, Pail or Drum. */
+  unit: string
+}
+
+/**
+ * The second barcode an item has for the pack it comes in: the same number, ending in the pack's unit code.
+ *   Bottle, Gal, Cup, Can in a box → Box          (108000901 → 108000902, 003004306 → 003004302)
+ *   Kg in a pail or drum           → Pail / Drum  (074002510 P15KG → 074002503, 003004910 D180KG → 003004904)
+ * Null for anything else, e.g. a loose sample bottle or a single can.
+ */
+export function packBarcode(barcode: string, pack: string): PackBarcode | null {
+  const p = parseBarcode(barcode)
+  if (!p) return null
+  const to = (unit: string) => ({ barcode: composeBarcode(p.brand, p.seq, unit), unit: unitCodeLabel(unit) ?? unit })
+  if (BOXED_UNITS.has(p.unit) && pack.startsWith("Box")) return to(BOX)
+  if (p.unit === KG && pack.startsWith("Drum")) return to(DRUM)
+  if (p.unit === KG && pack.startsWith("Pail")) return to(PAIL)
+  return null
+}
